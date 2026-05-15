@@ -154,6 +154,24 @@ button:hover {
     cursor: pointer;
 }
 
+/* Make sure cell text is visible (buttons inherit white color by default) */
+.cell {
+    color: var(--ink) !important;
+    box-shadow: inset 0 -6px 10px rgba(27,31,58,0.03);
+    transition: color 150ms ease, transform 120ms ease;
+    font-size: clamp(2rem, 6vw, 3rem);
+}
+
+.symbol-x {
+    color: var(--accent) !important;
+    text-shadow: 0 2px 0 rgba(255,255,255,0.25);
+}
+
+.symbol-o {
+    color: var(--accent-2) !important;
+    text-shadow: 0 2px 0 rgba(255,255,255,0.25);
+}
+
 .cell:hover {
     border-color: var(--accent-2);
 }
