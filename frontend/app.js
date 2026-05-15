@@ -1,6 +1,4 @@
-const defaultApiBase = "https://backend-production-aa4bc.up.railway.app";
-
-const apiBaseInput = document.getElementById("apiBase");
+const defaultApiBase = "https://jogo-da-velha-multiplayer-production.up.railway.app";
 const matchIdInput = document.getElementById("matchIdInput");
 const boardEl = document.getElementById("board");
 
@@ -16,7 +14,7 @@ const btnJoin = document.getElementById("btnJoin");
 const btnRefresh = document.getElementById("btnRefresh");
 
 const state = {
-    apiBase: localStorage.getItem("apiBase") || defaultApiBase,
+    apiBase: defaultApiBase,
     matchId: localStorage.getItem("matchId") || "",
     playerId: localStorage.getItem("playerId") || "",
     symbol: localStorage.getItem("symbol") || "",
@@ -27,11 +25,9 @@ const state = {
     ]
 };
 
-apiBaseInput.value = state.apiBase;
 matchIdInput.value = state.matchId;
 
 function saveState() {
-    localStorage.setItem("apiBase", state.apiBase);
     localStorage.setItem("matchId", state.matchId);
     localStorage.setItem("playerId", state.playerId);
     localStorage.setItem("symbol", state.symbol);
@@ -79,7 +75,6 @@ async function rpc(path, method = "GET", body) {
 
 async function createMatch() {
     try {
-        state.apiBase = apiBaseInput.value.trim();
         const data = await rpc("/rpc/create", "POST");
         if (!data.success) {
             setMessage(data.message || "Nao foi possivel criar a partida.");
@@ -100,7 +95,6 @@ async function createMatch() {
 
 async function joinMatch() {
     try {
-        state.apiBase = apiBaseInput.value.trim();
         const typedMatchId = matchIdInput.value.trim();
         if (!typedMatchId) {
             setMessage("Informe o matchId para entrar.");
@@ -125,7 +119,6 @@ async function joinMatch() {
 
 async function refreshState() {
     try {
-        state.apiBase = apiBaseInput.value.trim();
         if (!state.matchId) {
             setMessage("Crie ou entre em uma partida antes de atualizar.");
             return;
