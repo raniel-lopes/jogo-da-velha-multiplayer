@@ -1,4 +1,14 @@
-const defaultApiBase = "https://jogo-da-velha-multiplayer-production.up.railway.app";
+const defaultApiBase = (function() {
+    try {
+        const host = location.hostname;
+        if (host === 'localhost' || host === '127.0.0.1') {
+            return 'http://localhost:8080';
+        }
+    } catch (e) {
+        // ignore (e.g., running in non-browser environment)
+    }
+    return 'https://jogo-da-velha-multiplayer-production.up.railway.app';
+})();
 const matchIdInput = document.getElementById("matchIdInput");
 const boardEl = document.getElementById("board");
 
@@ -49,7 +59,12 @@ function renderBoard() {
         for (let col = 0; col < 3; col++) {
             const cell = document.createElement("button");
             cell.className = "cell";
-            cell.textContent = state.board[row][col] || "";
+            const symbol = state.board[row][col] || "";
+            cell.textContent = symbol;
+            // Add symbol-specific classes for coloring
+            cell.classList.remove("symbol-x", "symbol-o");
+            if (symbol === "X") cell.classList.add("symbol-x");
+            if (symbol === "O") cell.classList.add("symbol-o");
             cell.addEventListener("click", () => handleMove(row, col));
             boardEl.appendChild(cell);
         }
