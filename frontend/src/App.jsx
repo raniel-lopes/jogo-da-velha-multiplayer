@@ -59,9 +59,11 @@ export default function App() {
     return data
   }
 
-  const syncState = async (targetMatchId = matchId) => {
+  const syncState = async (targetMatchId = matchId, { silent = false } = {}) => {
     if (!targetMatchId) {
-      setMessage('Crie ou entre em uma partida primeiro.')
+      if (!silent) {
+        setMessage('Crie ou entre em uma partida primeiro.')
+      }
       return
     }
 
@@ -73,9 +75,36 @@ export default function App() {
     setBoard(data.board || defaultBoard())
     setTurn(data.currentTurn || '-')
     setStatus(data.status || 'UNKNOWN')
-    setMessage(data.winner ? `Vencedor: ${data.winner}` : data.message || 'Sincronizado.')
+    if (data.winner) {
+      setMessage(`Vencedor: ${data.winner}`)
+    } else if (!silent) {
+      setMessage(data.message || 'Sincronizado.')
+    }
     setLastUpdated(new Date().toLocaleTimeString())
   }
+
+  useEffect(() => {
+    if (!matchId) return
+
+    let cancelled = false
+    const poll = async () => {
+      try {
+        await syncState(matchId, { silent: true })
+      } catch (error) {
+        if (!cancelled) {
+          // Mantem a mensagem atual em falhas de sincronizacao automatica.
+        }
+      }
+    }
+
+    poll()
+    const intervalId = setInterval(poll, 2000)
+
+    return () => {
+      cancelled = true
+      clearInterval(intervalId)
+    }
+  }, [matchId])
 
   const runAction = async (action) => {
     setBusy(true)
@@ -113,10 +142,6 @@ export default function App() {
     setSymbol(data.symbol)
     setMessage('Conexao estabelecida. Sistema sincronizado.')
     await syncState(data.matchId)
-  })
-
-  const refreshState = async () => runAction(async () => {
-    await syncState()
   })
 
   const makeMove = async (row, col) => runAction(async () => {
@@ -191,9 +216,6 @@ export default function App() {
             </button>
             <button className="ghost-button" onClick={() => joinMatch(matchId)} disabled={busy}>
               Entrar na partida
-            </button>
-            <button className="ghost-button" onClick={refreshState} disabled={busy}>
-              Sincronizar
             </button>
           </div>
         </div>
